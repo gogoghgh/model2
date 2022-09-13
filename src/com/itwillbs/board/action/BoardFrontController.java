@@ -134,6 +134,38 @@ public class BoardFrontController extends HttpServlet{
 				e.printStackTrace();
 			}
 		}// else if --- 패턴3 --- /BoardContent.bo 
+		else if(command.equals("/BoardUpdate.bo")){
+			System.out.println("(from BoardFrontController_doProcess) C: /BoardUpdate.bo 호출");
+			System.out.println("(from BoardFrontController_doProcess) C: DB 사용, 해당 정보 출력!!(select로 가져오기)");
+			
+			// BoardUpdateAction 객체 만들기~~ <-- DB 쓸거니까!!
+			action = new BoardUpdateAction();
+			
+			// forward에 담기 <-- 객체 만들었으니까!!
+			try {
+				forward = action.execute(request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+		}// else if ---  /BoardUpdate.bo 
+		else if(command.equals("/BoardUpdatePro.bo")){
+			System.out.println("(from BoardFrontController_doProcess) C: /BoardUpdatePro.bo 호출");
+			System.out.println("(from BoardFrontController_doProcess) C: DB 사용 O, 페이지 이동 O");
+										// DB 가서 update로 수정하고, 페이지 이동
+			
+			// BoardUpdateProAction 객체 만들기 <-- DB 쓸거니까
+			action = new BoardUpdateProAction();
+			
+			// forward에 담아주기 <-- Action에 execute 메서드 호출하니까
+			try {
+				forward = action.execute(request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			
+		}// else if ---  /BoardUpdatePro.bo
 		
 		
 		// 2. 가상 주소 매핑 끝 -----------------------------------
