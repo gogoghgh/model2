@@ -15,11 +15,13 @@ public class BoardWriteAction implements Action {
 		// 왜욤?? java에서는 request란 객체 못 씀,, jsp가 아니좌나요
 		// 근데 이 메서드에선 매개변수로 request, response를 받아오니까,,, 사용 가넝한!!
 		// jsp 페이지에서 -> java한테 request, response를 줄 수 있나?? 예스,,,, 
-		// how? 컨트롤러!!!(=서블릿)가  jsp -> 컨트롤러 -> java(class) 둘이를 연결해줌
-		// doProcess 메서드에도 매개변수로 request, response 있음,, 
+		// how? 컨트롤러를 통해서!!!!!!!
+		// 컨트롤러!!!(=서블릿)가  jsp   -> 컨트롤러   -> java(class) 둘이를 연결해줌
+		//                        View     Controller   Model(action...)
+		// doProcess 메서드(in BoardFrontController!!!)에도 매개변수로 request, response 있음,, 
 		
 		System.out.println("(from BoardWriteAction) Model: execute() 호출 완");
-		// 1. 폼태그에서 submit 했으니 한글 데이터 넘어옴 -> 한글 처리
+		// 1. 폼태그(writeForm.jsp)에서 글 쓰고,, submit 했으니 한글 데이터 넘어옴 -> 한글 처리
 		request.setCharacterEncoding("UTF-8");
 		
 		// 2. 전달된 정보 저장(제목, 비밀번호, 이름, 내용)

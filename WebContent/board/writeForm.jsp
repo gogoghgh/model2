@@ -13,7 +13,7 @@
 	
 	<fieldset>
 		<form action="./BoardWriteAction.bo" method="post">
-						<!-- 이전에 pro 페이지에서 했던 내용들 인제 여기서 다 할 것 -->
+						<!-- ㄴ 이전에 pro 페이지에서 했던 내용들 인제 여기서(..action) 다 할 것 -->
 			글쓴이: <input type="text" name="name"> <br> 
 			비 번: <input type="password" name="pass"> <br> 
 			제 목: <input type="text" name="subject"> <br> 

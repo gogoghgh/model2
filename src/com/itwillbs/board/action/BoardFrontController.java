@@ -43,9 +43,9 @@ public class BoardFrontController extends HttpServlet{
 		
 		System.out.println("\n2. 가상 주소 매핑 시작-----------");
 		// 2. 가상 주소 매핑 -----------------------------------
-		Action action = null;
+		Action action = null; // ~~~Action (= process.. = Model!!!) 중 젤 대가리!!!!!! 인터페이스
 		// 3)
-		ActionForward forward = null; // 미리 선언,, 왜냐면 이 변수 여러 번 쓸거라서
+		ActionForward forward = null; // 미리 선언,, 왜냐면 이 변수(통행권) 여러 번 쓸거라서
 		
 		// 1)
 		if(command.equals("/BoardWrite.bo")){
@@ -58,12 +58,12 @@ public class BoardFrontController extends HttpServlet{
 			System.out.println("(from BoardFrontController.doProcess) C: /BoardWrite.bo 주소 호출됨");
 			System.out.println("(from BoardFrontController.doProcess) C: DB 정보 필요 없음 -> view 페이지로 이동시킬거임");
 			
-			// 4) 객체 생성해주기~ = 티켓 만들기~ -> 티켓 안에 정보 저장해주기
+			// 4) 객체 생성해주기~ = 통행권 티켓 만들기~ -> 티켓 안에 정보 저장해주기
 			forward = new ActionForward();
 //			forward.setPath(path); // 어디로 갈거고
 //			forward.setRedirect(isRedirect); // 어떻게 갈건지
 			forward.setPath("./board/writeForm.jsp");
-				// 찐 주소네?WebContent/board/writeForm.jsp 페이지로 가라~
+				// 찐 주소네? WebContent/board/writeForm.jsp 페이지로 가라~
 			forward.setRedirect(false); // Redirect 방식이냐? ㄴㄴ 아니다~ =forward방식으로 갈 것이다~~~
 			
 			// 이동 완?? ㄴㄴㄴ 아직 안 갔고,, 티켓만 만들었음!!!
@@ -80,6 +80,7 @@ public class BoardFrontController extends HttpServlet{
 			// BoardWriteAction() 객체 생성 + 예외 처리,, ㅋ
 //			BoardWriteAction bwAction = new BoardWriteAction();
 			action = new BoardWriteAction(); // 인제 이렇게 upcasting해서 씁시다,,
+			//  上          下
 			
 			try {
 //				bwAction.execute(request, response);

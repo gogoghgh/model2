@@ -86,7 +86,7 @@ public class BoardListAction implements Action{
 		// 모두 가져오지 말고,, 나눠서 가져오기 위한 메서드
 		List<BoardDTO> boardList = dao.getBoardList(startRow, pageSize); // 메서드 오버로딩!! 매개변수 다르게 하나 더 만들고 오자
 		
-		System.out.println("(from BoardListAction) Model: 게시판 글 정보 저장 완");
+		System.out.println("(from BoardListAction) Model: 게시판 글 정보 저장 완"); ///???????????
 		
 		
 		
@@ -97,7 +97,7 @@ public class BoardListAction implements Action{
 		// ex. 전체 글 50개 -> 한 페이지에 10개씩 출력하면?  5개 페이지 필요함
 		//     전체 글 55개 -> 한 페이지에 10개씩 출력하면?  6개 페이지 필요함 50 + 5
 		
-		int pageCount = cnt / pageSize + (cnt % pageSize == 0 ? 0 : 1 ) ; // js에서 사과 박스 구하던 로직,,이랑 똑같
+		int pageCount = cnt / pageSize + (cnt % pageSize == 0 ? 0 : 1 ); // js에서 사과 박스 구하던 로직,,이랑 똑같
 											// 나머지 없으면 0 더하고 : 나머지 있으면 1페이지 더하고
 		
 		// 한 화면에 보여줄 페이지 수(= 페이지 블럭) 몇 개 할거냐??? 정하기     이전 1 2 3 4 5.. 9 10 다음
@@ -123,11 +123,11 @@ public class BoardListAction implements Action{
 		// 페이징 처리2 (하단 페이지 링크... 이전, 다음,, 1 2 3페이지ㅡ,,,,,) ---------------------------- 끝
 		
 		
-		// Model -> view 페이지로 정보 전달을 위해, request 영역에 저장
+		// Model(지금 여기.. Action) -> view 페이지로 boardList 정보 전달을 위해, request 영역에 저장
 		request.setAttribute("boardList", boardList);
-		System.out.println("(from BoardListAction) Model: 리스트 정보 request 영역에 저장 완");
+		System.out.println("(from BoardListAction) Model: BoardList 정보 request 영역에 저장 완");
 		
-		// 페이징 처리 정보 전달 (request 영역)
+		// + 페이징 처리 정보 전달을 위해 request 영역에 저장
 		request.setAttribute("pageNum", pageNum);
 		request.setAttribute("cnt", cnt);
 		request.setAttribute("pageCount", pageCount);
@@ -140,7 +140,7 @@ public class BoardListAction implements Action{
 		
 		
 		
-		// 받아온 list.. 화면에 출력하기!!
+		// 받아온 list.. 화면에 출력하기!!  <<????????????
 		// 페이지 이동(화면 전환)하기 위해 ActionForward 객체 생성
 		ActionForward forward = new ActionForward();
 //		forward.setPath("./board/boardListAll.jsp"); // 갈 곳, 어떻게 갈지    구
