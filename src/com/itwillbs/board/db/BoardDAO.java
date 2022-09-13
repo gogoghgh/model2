@@ -99,7 +99,7 @@ public class BoardDAO {
 	}
 	// 자원 해제 끝//////////////////////////////////////////////////////////////
 	
-	// 글쓰기 메서드 boardWrite()
+	// 1. 글쓰기 메서드 boardWrite()
 	public void boardWrite(BoardDTO dto){
 		System.out.println("\n (from BoardDAO_boardWrite) C: boardWrite() 호출");
 
@@ -182,9 +182,9 @@ public class BoardDAO {
 		}
 		
 	}
-	// 글쓰기 메서드 boardWrite() 끝///////////////////////////////////////////////////
+	// 1. 글쓰기 메서드 boardWrite() 끝///////////////////////////////////////////////////
 	
-	// 글 목록 조회(all) - getBoardList()
+	// 2. 글 목록 조회(all) - getBoardList()
 	public List<BoardDTO> getBoardList(){
 		System.out.println("\n(from BoardDAO_getBoardList) C: getBoardList() 호출");
 
@@ -241,9 +241,9 @@ public class BoardDAO {
 		return boardList;
 		
 	}	
-	// 글 목록 조회(all) - getBoardList() 끝///////////////////////////////////////////
+	// 2. 글 목록 조회(all) - getBoardList() 끝///////////////////////////////////////////
 	
-	// 글 개수 조회(all) - getBoardCount()
+	// 3. 글 개수 조회(all) - getBoardCount()
 	public int getBoardCount(){
 		System.out.println("\n(from BoardDAO_getBoardCount) C: getBoardCount() 호출");
 		int cnt = 0;
@@ -274,10 +274,10 @@ public class BoardDAO {
 		
 		return cnt;
 	}
-	// 글 개수 조회(all) - getBoardCount() 끝///////////////////////////////////////////
+	// 3. 글 개수 조회(all) - getBoardCount() 끝///////////////////////////////////////////
 	
 	
-	// 글 목록 조회(all 아니고 내가 원하는 만큼만) - getBoardList(startRow, pageSize) 오버로딩!!!!!
+	// 2-1. 글 목록 조회(all 아니고 내가 원하는 만큼만) - getBoardList(startRow, pageSize) 오버로딩!!!!!
 	public List<BoardDTO> getBoardList(int startRow, int pageSize){
 		System.out.println("\n(from BoardDAO_getBoardList) C: getBoardList(sr, ps) 호출");
 
@@ -346,10 +346,10 @@ public class BoardDAO {
 		return boardList;
 		
 	}	
-	// 글 목록 조회(all 아니고 내가 원하는 만큼만) - getBoardList(startRow, pageSize) 끝//////////////////////////////////////
+	// 2-1. 글 목록 조회(all 아니고 내가 원하는 만큼만) - getBoardList(startRow, pageSize) 끝//////////////////////////////////////
 	
 	
-	// 글 조회수 1 증가 updateReadcount(bno)
+	// 4. 글 조회수 1 증가 updateReadcount(bno)
 	public void updateReadcount(int bno){
 		System.out.println("(from BoardDAO_updateReadcount) C: updateReadcount(int bno) 호출 완");
 		
@@ -379,9 +379,9 @@ public class BoardDAO {
 		}
 
 	}
-	// 글 조회수 1 증가 updateReadcount(bno) 끝 //////////////////////////////////////////////////////////
+	// 4. 글 조회수 1 증가 updateReadcount(bno) 끝 //////////////////////////////////////////////////////////
 	
-	// 특정 글 1개의 정보 조회 getBoard(bno)
+	// 5. 특정 글 1개의 정보 조회 getBoard(bno)
 	public BoardDTO getBoard(int bno){
 		System.out.println("(from BoardDAO_getBoard) C: getBoard(bno) 호출");
 
@@ -434,7 +434,76 @@ public class BoardDAO {
 		
 		return dto;
 	}
-	// 특정 글 1개의 정보 조회 getBoard(bno) 끝 //////////////////////////////////////////////////////////
+	// 5. 특정 글 1개의 정보 조회 getBoard(bno) 끝 //////////////////////////////////////////////////////////
+	
+	
+	// 6. 글 정보 수정 updateBoard(dto) 메서드 시작 ////////////////////////////////////////////////////////
+	public int updateBoard(BoardDTO dto){
+		int result = -1;
+		// result = 1 본인 인증 완 -> 글 수정 성공 
+		//        = 0 비번 틀림,, 본인 X
+		//        = -1 게시판에 글 없다 ㄷㄷㄷ
+		
+		try {
+			// 1. 2. DB 연결   + 6. closeDB
+			con = getConnect();
+			
+			// 3. sql 작성 & pstmt & ?
+			sql = "select pass from itwill_board where bno=?";
+						// pk가 걸려있는 bno에 해당하는 pass 가 있다면,, 글은 존재하는 거다~~ 
+						// bno에 해당하는 pass가 없다? 비번 틀린 거? ㄴㄴ
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, dto.getBno());
+			
+			// 4. sql 실행 & rs에 담기
+			rs = pstmt.executeQuery();
+			
+			// 5. rs에 담긴 데이터 처리
+			if(rs.next()){
+				// 데이터 있을 때~ 
+				// 비번 다시 확인
+				if(dto.getPass().equals(rs.getString("pass"))){
+					// db에서 가져온(rs에 담긴) pass랑 -- dto에 있는 pass랑 비교
+					// 비번 같으면~ == 게시판에 글도 있고, 비번도 맞더라~~ == 본인이 쓴 글 맞다~~
+					// 여기서!!!!! 수정 가능하게~~~~~~~~~~~~~~~~~~
+					// 3. sql & pstmt & ?
+					sql = "update itwill_board "
+							+ "set name=?, subject=?, content=? "
+							+ "where bno=? ";
+					
+					pstmt = con.prepareStatement(sql);
+					
+					pstmt.setString(1, dto.getName());
+					pstmt.setString(2, dto.getSubject());
+					pstmt.setString(3, dto.getContent());
+					pstmt.setInt(4, dto.getBno());
+					
+					// 4. sql 실행
+					result = pstmt.executeUpdate(); 
+								// executeUpdate 실행하고 나면 정수형 데이터(쿼리 날린 결과, 몇 row가 영향을 받았냐) 리턴함!!! 
+								// 근데 여기선 무조건 1row니까~ 1이 리턴되는고 
+				} else {
+					// 비번 다름
+					result = 0;
+				}// 안에 if-else
+
+			} else {
+				// bno에 해당하는 비번이 없다~~ = 게시판에 글이 없다~~~
+				result = -1;
+			}
+			System.out.println("(from BoardDAO_updateBoard) 글 수정 완 result: " + result);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+		} finally {
+			closeDB();
+		}
+		
+		return result;
+	}
+	// 6. 글 정보 수정 updateBoard(dto) 메서드 끝 ////////////////////////////////////////////////////////
+	
 	
 	
 }// BoardDAO class
