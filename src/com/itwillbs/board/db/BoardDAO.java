@@ -50,6 +50,7 @@ public class BoardDAO {
 	}*/
 	// 디비 연결 끝///////////////////////////////////////////////////////////////
 	
+	
 	// DB 연결 메서드2 커넥션풀 이용!!!!!!!!!
 	private Connection getConnect() throws Exception{
 		// 디비 연결정보 context.xml
@@ -82,6 +83,7 @@ public class BoardDAO {
 	}
 	// 디비 연결 끝///////////////////////////////////////////////////////////////
 	
+	
 	// 자원 해제
 	public void closeDB(){
 		//con -> pstmt -> rs 순으로 만들어지니까 해제는 역순으로
@@ -99,9 +101,10 @@ public class BoardDAO {
 	}
 	// 자원 해제 끝//////////////////////////////////////////////////////////////
 	
+	
 	// 1. 글쓰기 메서드 boardWrite()
 	public void boardWrite(BoardDTO dto){
-		System.out.println("\n (from BoardDAO_boardWrite) C: boardWrite() 호출");
+		System.out.println("\n (from BoardDAO_1.boardWrite) C: boardWrite() 호출");
 
 		// dto에 글쓴 정보 저장되어 있으니까,, 그 dto를 매개변수로 받아오기
 		int bno = 0; // 글 번호 저장할 변수 준비
@@ -146,7 +149,7 @@ public class BoardDAO {
 				
 			} */
 			
-			System.out.println("(from BoardDAO_boardWrite) 글번호 bno: " + bno);
+			System.out.println("(from BoardDAO_1.boardWrite) 글번호 bno: " + bno);
 			// 글 번호 계산 끝났고,,
 			// 게시판 글쓰기 실행
 			// 다시 3단계. sql 작성 & pstmt & ?
@@ -184,9 +187,10 @@ public class BoardDAO {
 	}
 	// 1. 글쓰기 메서드 boardWrite() 끝///////////////////////////////////////////////////
 	
+	
 	// 2. 글 목록 조회(all) - getBoardList()
 	public List<BoardDTO> getBoardList(){
-		System.out.println("\n(from BoardDAO_getBoardList) C: getBoardList() 호출");
+		System.out.println("\n(from BoardDAO_2.getBoardList) C: getBoardList() 호출");
 
 		// 글 정보 모~~~두를 저장하는 배열 (가변길이!! 고정길이 배열 BoardDTO[] 말고)
 		List<BoardDTO> boardList = new ArrayList<BoardDTO>();
@@ -228,7 +232,7 @@ public class BoardDAO {
 				boardList.add(dto);
 				
 			} // while
-			System.out.println("(from BoardDAO_getBoardList) C: List에 저장 완");
+			System.out.println("(from BoardDAO_2.getBoardList) C: List에 저장 완");
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -243,51 +247,18 @@ public class BoardDAO {
 	}	
 	// 2. 글 목록 조회(all) - getBoardList() 끝///////////////////////////////////////////
 	
-	// 3. 글 개수 조회(all) - getBoardCount()
-	public int getBoardCount(){
-		System.out.println("\n(from BoardDAO_getBoardCount) C: getBoardCount() 호출");
-		int cnt = 0;
-		
-		try {
-			// 1+2. 디비 연결(커넥션 풀 이용) + 6. closeDB
-			con = getConnect();
-			
-			// 3. sql 작성 & pstmt & ?
-			sql = "select count(*) from itwill_board";
-			pstmt = con.prepareStatement(sql);
-			
-			// 4. sql 실행 + rs
-			rs = pstmt.executeQuery();
-			
-			// 5. 데이터 처리 (select날리니까)
-			if(rs.next()){ // rs에 데이터가 있을 때~
-				cnt = rs.getInt(1); // 1번 컬럼(=count(*)) 값을 cnt에 저장쓰
-			}
-			
-			System.out.println("(from BoardDAO_getBoardCount) C: 글 개수는 총 " + cnt + "개^^");
-			
-		} catch (Exception e) { 
-			e.printStackTrace();
-		} finally {
-			closeDB();
-		}
-		
-		return cnt;
-	}
-	// 3. 글 개수 조회(all) - getBoardCount() 끝///////////////////////////////////////////
-	
 	
 	// 2-1. 글 목록 조회(all 아니고 내가 원하는 만큼만) - getBoardList(startRow, pageSize) 오버로딩!!!!!
 	public List<BoardDTO> getBoardList(int startRow, int pageSize){
-		System.out.println("\n(from BoardDAO_getBoardList) C: getBoardList(sr, ps) 호출");
-
+		System.out.println("\n(from BoardDAO_2-1.getBoardList) C: getBoardList(sr, ps) 호출");
+		
 		// 글 정보 모~~~두를 저장하는 배열 (가변길이!! 고정길이 배열 BoardDTO[] 말고)
 		List<BoardDTO> boardList = new ArrayList<BoardDTO>();
 		
 		try {
 			// 1+2
 			con = getConnect();
-
+			
 			// 3 sql & pstmt & ?
 //			sql = "select * from itwill_board"; (x)
 			
@@ -333,7 +304,7 @@ public class BoardDAO {
 				boardList.add(dto);
 				
 			} // while
-			System.out.println("(from BoardDAO_getBoardList) C: List에 저장 완");
+			System.out.println("(from BoardDAO_2-1.getBoardList) C: List에 저장 완");
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -349,9 +320,43 @@ public class BoardDAO {
 	// 2-1. 글 목록 조회(all 아니고 내가 원하는 만큼만) - getBoardList(startRow, pageSize) 끝//////////////////////////////////////
 	
 	
+	// 3. 글 개수 조회(all) - getBoardCount()
+	public int getBoardCount(){
+		System.out.println("\n(from BoardDAO_3.getBoardCount) C: getBoardCount() 호출");
+		int cnt = 0;
+		
+		try {
+			// 1+2. 디비 연결(커넥션 풀 이용) + 6. closeDB
+			con = getConnect();
+			
+			// 3. sql 작성 & pstmt & ?
+			sql = "select count(*) from itwill_board";
+			pstmt = con.prepareStatement(sql);
+			
+			// 4. sql 실행 + rs
+			rs = pstmt.executeQuery();
+			
+			// 5. 데이터 처리 (select날리니까)
+			if(rs.next()){ // rs에 데이터가 있을 때~
+				cnt = rs.getInt(1); // 1번 컬럼(=count(*)) 값을 cnt에 저장쓰
+			}
+			
+			System.out.println("(from BoardDAO_3.getBoardCount) C: 글 개수는 총 " + cnt + "개^^");
+			
+		} catch (Exception e) { 
+			e.printStackTrace();
+		} finally {
+			closeDB();
+		}
+		
+		return cnt;
+	}
+	// 3. 글 개수 조회(all) - getBoardCount() 끝///////////////////////////////////////////
+	
+	
 	// 4. 글 조회수 1 증가 updateReadcount(bno)
 	public void updateReadcount(int bno){
-		System.out.println("(from BoardDAO_updateReadcount) C: updateReadcount(int bno) 호출 완");
+		System.out.println("(from BoardDAO_4.updateReadcount) C: updateReadcount(int bno) 호출 완");
 		
 		try {
 			// 1+2.    + 6. 자원해제 미리
@@ -369,7 +374,7 @@ public class BoardDAO {
 			// 4. sql 실행
 			pstmt.executeUpdate();
 			
-			System.out.println("(from BoardDAO_updateReadcount) C: 게시판 글 조회수 +1 완");
+			System.out.println("(from BoardDAO_4.updateReadcount) C: 게시판 글 조회수 +1 완");
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -381,9 +386,10 @@ public class BoardDAO {
 	}
 	// 4. 글 조회수 1 증가 updateReadcount(bno) 끝 //////////////////////////////////////////////////////////
 	
+	
 	// 5. 특정 글 1개의 정보 조회 getBoard(bno)
 	public BoardDTO getBoard(int bno){
-		System.out.println("(from BoardDAO_getBoard) C: getBoard(bno) 호출");
+		System.out.println("(from BoardDAO_5.getBoard) C: getBoard(bno) 호출");
 
 		BoardDTO dto = null; // 여기서  new XXXX!!!!!  필요할 때 생성할 수 있도록,, 여기선 null로만
 		
@@ -424,7 +430,7 @@ public class BoardDAO {
 				
 			}// if
 			
-			System.out.println("(from BoardDAO_getBoard) C: 게시글 " + bno + "번 정보 dto에 저장 완");
+			System.out.println("(from BoardDAO_5.getBoard) C: 게시글 " + bno + "번 정보 dto에 저장 완");
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -439,6 +445,7 @@ public class BoardDAO {
 	
 	// 6. 글 정보 수정 updateBoard(dto) 메서드 시작 ////////////////////////////////////////////////////////
 	public int updateBoard(BoardDTO dto){
+		System.out.println("(from BoardDAO_6.updateBoard) C: updateBoard(dto) 호출");
 		int result = -1;
 		// result = 1 본인 인증 완 -> 글 수정 성공 
 		//        = 0 비번 틀림,, 본인 X
@@ -491,7 +498,7 @@ public class BoardDAO {
 				// bno에 해당하는 비번이 없다~~ = 게시판에 글이 없다~~~
 				result = -1;
 			}
-			System.out.println("(from BoardDAO_updateBoard) 글 수정 완 result: " + result);
+			System.out.println("(from BoardDAO_6.updateBoard) 글 수정 완 result: " + result);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -503,6 +510,85 @@ public class BoardDAO {
 		return result;
 	}
 	// 6. 글 정보 수정 updateBoard(dto) 메서드 끝 ////////////////////////////////////////////////////////
+	
+	
+	
+	
+	// self //////////////////////////////////////////////
+	// 7. 답글 쓰기 메서드 reInsertBoard(dto)
+	public void reInsertBoard(BoardDTO dto) {
+		System.out.println("(from BoardDAO_7.reInsertBoard) 답글 쓰기 메서드 호출됨");
+		
+		int result = -1;
+		
+		// 1.지역변수생성
+		int num = 0;
+		
+		// 2. 디비연결
+		try {
+			getConnect();
+		
+			// sql(게시판의 글번호 중 최댓값 계산) & pstmt
+			
+			// 3. 답글번호 계산
+			sql = "select max(bno) from itwill_board";
+			pstmt = con.prepareStatement(sql);
+			
+			rs = pstmt.executeQuery();
+			
+			if (rs.next()) {
+				num = rs.getInt(1) + 1;
+			}
+			
+			System.out.println("(from BoardDAO_7.reInsertBoard) 답글 번호 : " + num);
+
+			// 4. 답글 순서 재배치
+			// re_ref(같은 그룹기준)으로 re_seq값이 기존의 값보다 큰 값이 있을경우 re_seq값을 1증가시켜서
+			// 순서재배치
+			sql = "update itwill_board "
+					+ "set re_seq = re_seq+1 " 
+					+ "where re_ref=? and re_seq>?";
+			
+			pstmt = con.prepareStatement(sql);
+			
+			pstmt.setInt(1, dto.getRe_ref());
+			pstmt.setInt(2, dto.getRe_seq());
+			
+			pstmt.executeUpdate();
+
+			// 5. 답글 정보 저장
+			sql = "insert into itwill_board " + "values(?,?,?,?,?" + ",?,?,?,?,now()" + ",?,?)";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, num);// bno는 가지고있는게 아니라 계산해서 만든것이므로 num사용
+			pstmt.setString(2, dto.getName());
+			pstmt.setString(3, dto.getPass());
+			pstmt.setString(4, dto.getSubject());
+			pstmt.setString(5, dto.getContent());
+			pstmt.setInt(6, dto.getReadcount());
+			pstmt.setInt(7, dto.getRe_ref()); // 기존 원글의 그룹번호와 동일
+			pstmt.setInt(8, dto.getRe_lev() + 1); // 기존의 값 + 1
+			pstmt.setInt(9, dto.getRe_seq() + 1); // 기존의 값 + 1
+			pstmt.setString(10, dto.getFile());
+			pstmt.setString(11, dto.getIp());
+			
+			pstmt.executeUpdate();
+			
+			result = 1;
+
+			System.out.println("(from BoardDAO_7.reInsertBoard): 저장된 답글 내용: " + dto);
+			System.out.println("(from BoardDAO_7.reInsertBoard): 답글쓰기 성공 result: " + result);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+		} finally {
+			closeDB();
+		}
+	}
+	// 7. 답글 쓰기 메서드 reInsertBoard(dto) 끝
+	
+	
+	
 	
 	
 	

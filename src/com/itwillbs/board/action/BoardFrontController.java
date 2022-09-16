@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+
 // http://localhost:8088/Model2/board ㄴㄴ
 // http://localhost:8088/Model2/board2 ㄴㄴ
 // http://localhost:8088/Model2/test.bo 
@@ -135,6 +136,7 @@ public class BoardFrontController extends HttpServlet{
 				e.printStackTrace();
 			}
 		}// else if --- 패턴3 --- /BoardContent.bo 
+		
 		else if(command.equals("/BoardUpdate.bo")){
 			System.out.println("(from BoardFrontController_doProcess) C: /BoardUpdate.bo 호출");
 			System.out.println("(from BoardFrontController_doProcess) C: DB 사용, 해당 정보 출력!!(select로 가져오기)");
@@ -150,6 +152,7 @@ public class BoardFrontController extends HttpServlet{
 			}
 			
 		}// else if ---  /BoardUpdate.bo 
+		
 		else if(command.equals("/BoardUpdatePro.bo")){
 			System.out.println("(from BoardFrontController_doProcess) C: /BoardUpdatePro.bo 호출");
 			System.out.println("(from BoardFrontController_doProcess) C: DB 사용 O, 페이지 이동 O");
@@ -167,6 +170,29 @@ public class BoardFrontController extends HttpServlet{
 			
 			
 		}// else if ---  /BoardUpdatePro.bo
+		
+		////////////////////////////////////////////////////// 내 파트
+		// 답글 
+		else if (command.equals("/BoardReWrite.bo")) {
+			System.out.println("(from BoardFrontController_doProcess) C: /BoardReWrite.bo 호출");
+			System.out.println("(from BoardFrontController_doProcess) C: DB 사용 X, 페이지 이동 O");
+			
+			forward = new ActionForward();
+			forward.setPath("./board/reWriteForm.jsp");
+			forward.setRedirect(false); // forward 방식 이동,, jsp 페이지니까
+			
+		} // BoardReWrite.bo 
+		
+		else if (command.equals("/BoardReWriteAction.bo")) {
+			System.out.println("(from BoardFrontController_doProcess) C: /BoardReWriteAction.bo 호출");
+			System.out.println("(from BoardFrontController_doProcess) C: DB 사용 O, 페이지 이동 O");
+			action = new BoardReWriteAction();
+			try {
+				forward = action.execute(request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} // BoardReWriteAction.bo
 		
 		
 		// 2. 가상 주소 매핑 끝 -----------------------------------
@@ -195,19 +221,21 @@ public class BoardFrontController extends HttpServlet{
 			}
 		}
 		// 3. 가상 주소 이동 끝 ----------------------------
-		System.out.println("3. 가상 주소 이동 끝-----------\n\n");
+		System.out.println("3. 가상 주소 이동 끝-----------\n\n\n\n");
 		
 	}
 	/////////doProcess 끝///////////////////////////////////////////////////
 	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("-------------------------------------------------------------------------------------------------------");
 		System.out.println("(from BoardFrontController.doGet) C: doGet() 실행");
 		doProcess(request, response);
 	}
 	
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("-------------------------------------------------------------------------------------------------------");
 		System.out.println("(from BoardFrontController.doPost) C: doPost() 실행");
 		doProcess(request, response);
 	}

@@ -45,6 +45,10 @@ public class BoardContentAction implements Action {
 		
 		request.setAttribute("pageNum", pageNum); // 출력할 때 사용
 		
+			// 확인용,, ㅠ
+			System.out.println("(from BoardContentAction) request영역에 저장된 dto: " + dto);
+		
+		
 		// 데이터 다 만들었고, request에 저장까지 해놨으니,, 인제 이 페이지에서 할 거 없음.. 나가자~~
 		// 출력할 view 페이지로 이동
 		//   이동할거니까 통행권 객체 생성 (어디로 갈지, 어떻게 갈지)
