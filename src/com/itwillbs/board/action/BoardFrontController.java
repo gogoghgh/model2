@@ -194,6 +194,8 @@ public class BoardFrontController extends HttpServlet{
 			}
 		} // BoardReWriteAction.bo
 		
+
+		
 		
 		// 2. 가상 주소 매핑 끝 -----------------------------------
 		System.out.println("2. 가상 주소 매핑 끝-----------\n");

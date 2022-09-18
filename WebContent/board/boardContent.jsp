@@ -1,3 +1,4 @@
+<%@page import="com.itwillbs.board.db.CommentDTO"%>
 <%@page import="com.itwillbs.board.db.BoardDTO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
@@ -6,6 +7,62 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>board/boardContent.jsp</title>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.min.js"></script>
+<script type="text/javascript">
+// 	$(document).ready(function(){
+		
+<%-- 		<% --%>
+// 		// 댓글 작업 시작,,, 객체 생성 해야 되겠지,,?
+// 		CommentDTO cdto = new CommentDTO();
+<%-- 		%> --%>
+
+		
+// 		// 1.댓글 적고 버튼 클릭하면 
+// 		// -> 2.해당 함수로 ajax가 실행되어
+// 		// -> 3. 페이지 이동 없이!! controller로 접속 가능하게 되고
+// 		// -> 4. data 전달 성공 시 
+// 		// -> 5. reload를 통해 실시간으로 댓글이 작성되는 모습을 기대할 수 있다,,
+// 		$("#cmtCnt-btn").click(function(){
+		
+// // 			alert("정상 작동합니더");
+// 		// 1.댓글 적고 버튼 클릭하면 
+<%-- 	<%--  --%>
+<%-- 			나중에 로그인 처리할 때 이것도 넣자~~ --%>
+<%-- 			로그인 안 한 사람이 댓글 쓰려고 하면,, 안 되게 제어 --%>
+<%-- 			<% --%>
+<%-- 				if(id==null){ --%>
+<%-- 			%>  --%>
+<%-- 			alert("로그인이 필요합니다"); --%>
+<%-- 			location.href="/login.bo"; --%>
+<%-- 			<% --%>
+<%-- 				} else { --%>
+<%-- 			%>  --%>
+			
+<%-- 	--%> --%>
+// 			// -> 2.해당 함수로 ajax가 실행되어
+// 			$.ajax({
+// 				// -> 3. 페이지 이동 없이!! controller로 접속 가능하게 되고
+// 				url: "/commentIn.bo",
+// 				type:"POST",
+// 				data:{
+<%-- 					num: '<%=cdto.getB_bno() %>', --%>
+// 					content:$("#cmtCnt").val()
+// 				},
+// 				// -> 4. data 전달 성공 시 
+// 				success: function () {
+// 					console.log("(boardContent.jsp) 보내기 성공");
+// 					location.reload();
+// 					// -> 5. reload를 통해 실시간으로 댓글이 작성되는 모습을 기대할 수 있다,, 
+// 				}
+				
+// 				}); // ajax
+			
+// 			}// function
+// 		});// click
+		
+// 	});// jquery ready
+
+</script>
 </head>
 <body>
 	<h1> board/boardContent.jsp </h1>
@@ -46,7 +103,7 @@
 		</tr>
 		<tr>
 			<td>내용</td>
-			<td colspan="3" height="300px"> ${dto.content }</td>
+			<td colspan="3" width="300px" height="300px"> ${dto.content }</td>
 		</tr>
 		<tr>
 			<td>첨부파일</td>
@@ -65,6 +122,20 @@
 			<td><input type="button" value="목록" onclick="location.href='./BoardList.bo?pageNum=${pageNum}';"></td>
 		</tr>
 	</table>
+	
+	<br><br>
+	
+	
+<!-- ----------------------- 댓글 구간^^ --------------------------------- -->
+	<div>
+		<div class="comment-txt">
+			<textarea id="cmtCnt" name="cmtCnt" placeholder="여러분의 소중한 댓글을 입력해주세요^^"
+			 		  rows="5" cols="70"></textarea>
+		</div>
+		<div class="comment-button">
+			<button id="cmtCnt-btn">댓글 달기</button>
+		</div>
+	</div>
 	
 </body>
 </html>
