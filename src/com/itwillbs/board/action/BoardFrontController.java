@@ -169,31 +169,97 @@ public class BoardFrontController extends HttpServlet{
 			}
 			
 			
-		}// else if ---  /BoardUpdatePro.bo
+		}// else if ---  /BoardUpdatePro.bo 끝
 		
-		////////////////////////////////////////////////////// 내 파트
-		// 답글 
+		else if (command.equals("/BoardDelete.bo")) {
+			System.out.println("(from BoardFrontController_doProcess) C: /BoardDelete.bo 호출");
+			System.out.println("(from BoardFrontController_doProcess) C: DB 사용 X, view 페이지로 이동 O"); 
+			// 패턴 1이네~~ DB 안 쓰면서,, view 페이지로 이동하는
+			
+			forward = new ActionForward();
+			
+			forward.setPath("./board/boardDelete.jsp");
+			forward.setRedirect(false); // jsp페이지로 가니까,, false
+										// 가상주소 -> 실제 주소(.jsp)로 이동하니까,,, 
+										// 주소 이동 일어나면 안되니까!!! 그럼 MVC 패턴 깨지는 거닉하
+			
+		}// BoardDelete.bo 끝
+		
+		else if (command.equals("/BoardDeleteAction.bo")) {
+			System.out.println("(from BoardFrontController_doProcess) C: /BoardDeleteAction.bo 호출");
+			System.out.println("(from BoardFrontController_doProcess) C: DB 사용 O, 페이지 이동 O ");
+			// 패턴 2
+			
+			action = new BoardDeleteAction();
+			
+			try {
+				action.execute(request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+		} // BoardDeleteAction.bo
+		
+		
+		// 답글 쓰기 //////////////////////////////////////////////////
 		else if (command.equals("/BoardReWrite.bo")) {
 			System.out.println("(from BoardFrontController_doProcess) C: /BoardReWrite.bo 호출");
-			System.out.println("(from BoardFrontController_doProcess) C: DB 사용 X, 페이지 이동 O");
+			System.out.println("(from BoardFrontController_doProcess) C: DB 사용 X, view 페이지로 이동 O"); 
 			
 			forward = new ActionForward();
 			forward.setPath("./board/reWriteForm.jsp");
-			forward.setRedirect(false); // forward 방식 이동,, jsp 페이지니까
+			forward.setRedirect(false); // forward 방식 이동,, jsp 페이지니까,, 찐 주소니까,, 호다닥 주소 숨기기
 			
 		} // BoardReWrite.bo 
 		
 		else if (command.equals("/BoardReWriteAction.bo")) {
 			System.out.println("(from BoardFrontController_doProcess) C: /BoardReWriteAction.bo 호출");
-			System.out.println("(from BoardFrontController_doProcess) C: DB 사용 O, 페이지 이동 O");
+			System.out.println("(from BoardFrontController_doProcess) C: DB 사용 O, 페이지 이동 O (list로)");
+			
 			action = new BoardReWriteAction();
+			
 			try {
 				forward = action.execute(request, response);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			
 		} // BoardReWriteAction.bo
 		
+		
+		
+		/////////////////////////// 댓글
+		// 댓글 구현 시작////////////////////////////////////////
+		else if (command.equals("/CommentWrite.bo")){
+			System.out.println("(from BoardFrontController_doProcess) C: /CommentWrite.bo 호출");
+			
+			action = new CommentWriteAction();
+			
+			try {
+				forward = action.execute(request, response);
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+		} // CommentWrite.bo 끝
+		
+		else if (command.equals("/CommentUpdate.bo")){
+			System.out.println("(from BoardFrontController_doProcess) C: /CommentUpdate.bo 호출");
+			
+			action = new CommentUpdateAction();
+			
+			try {
+				forward = action.execute(request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+		} // CommentUpdate.bo 끝
+		
+		
+		
+		// 댓글 구현 끝////////////////////////////////////////
 
 		
 		

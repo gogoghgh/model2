@@ -13,6 +13,7 @@ import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
 
+
 public class BoardDAO {
 	// DAO (Data Access Object) 데이터 처리 객체
 	// DB 쓰는 작업들 여기서 다,,,
@@ -512,6 +513,74 @@ public class BoardDAO {
 	// 6. 글 정보 수정 updateBoard(dto) 메서드 끝 ////////////////////////////////////////////////////////
 	
 	
+	// 8. 글 정보 삭제 deleteBoard(bno) 메서드 시작
+	public int deleteBoard(BoardDTO dto){
+		System.out.println("(from BoardDAO_8.deleteBoard) C: deleteBoard(dno) 호출됨");
+		int result = -1;
+		// result = 1 본인 인증 완 -> 글 삭제 성공 
+		//        = 0 비번 틀림,, 본인 X
+		//        = -1 게시판에 글 없다 ㄷㄷㄷ
+		
+		try {
+			// 1. 2. DB 연결   + 6. closeDB
+			con = getConnect();
+			
+			// 3. sql 작성 & pstmt & ?
+			sql = "select pass from itwill_board where bno=?";
+						// pk가 걸려있는 bno에 해당하는 pass 가 있다면,, 글은 존재하는 거다~~ 
+						// bno에 해당하는 pass가 없다? 비번 틀린 거? ㄴㄴ
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, dto.getBno());
+			
+			// 4. sql 실행 & rs에 담기
+			rs = pstmt.executeQuery();
+			
+			// 5. rs에 담긴 데이터 처리
+			if(rs.next()){
+				// 데이터 있을 때~ 
+				// 비번 다시 확인
+				if(dto.getPass().equals(rs.getString("pass"))){
+					// db에서 가져온(rs에 담긴) pass랑 -- dto에 있는 pass랑 비교
+					// 비번 같으면~ == 게시판에 글도 있고, 비번도 맞더라~~ == 본인이 쓴 글 맞다~~
+					// 여기서!!!!! 수정 가능하게~~~~~~~~~~~~~~~~~~
+					// 3. sql & pstmt & ?
+					sql = "delete from itwill_board "
+							+ "where bno=? ";
+					
+					pstmt = con.prepareStatement(sql);
+					
+					pstmt.setString(1, dto.getName());
+					pstmt.setString(2, dto.getSubject());
+					pstmt.setString(3, dto.getContent());
+					pstmt.setInt(4, dto.getBno());
+					
+					// 4. sql 실행
+					result = pstmt.executeUpdate(); 
+								// executeUpdate 실행하고 나면 정수형 데이터(쿼리 날린 결과, 몇 row가 영향을 받았냐) 리턴함!!! 
+								// 근데 여기선 무조건 1row니까~ 1이 리턴되는고 
+				} else {
+					// 비번 다름
+					result = 0;
+				}// 안에 if-else
+
+			} else {
+				// bno에 해당하는 비번이 없다~~ = 게시판에 글이 없다~~~
+				result = -1;
+			}
+			System.out.println("(from BoardDAO_8.deleteBoard) 글 삭제 완 result: " + result);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+		} finally {
+			closeDB();
+		}
+		
+		return result;
+		
+	}
+	// 8. 글 정보 삭제 deleteBoard(bno) 메서드 끝
+	
 	
 	
 	// self //////////////////////////////////////////////
@@ -519,64 +588,85 @@ public class BoardDAO {
 	public void reInsertBoard(BoardDTO dto) {
 		System.out.println("(from BoardDAO_7.reInsertBoard) 답글 쓰기 메서드 호출됨");
 		
-		int result = -1;
+		// STEP
+		// 1) bno 계산하기
+		// 2) 답글 순서 재배치 (re_seq 순서에 맞게 수정하고!!(=update) --> insert 해야 함)
+		// 3) 답글 쓰기 (insert)
 		
-		// 1.지역변수생성
-		int num = 0;
 		
-		// 2. 디비연결
+		// 지역변수 생성
+		int bno = 0;
+		
 		try {
-			getConnect();
+			// 1+2.    6.
+			con = getConnect();
 		
-			// sql(게시판의 글번호 중 최댓값 계산) & pstmt
+			// 
 			
-			// 3. 답글번호 계산
+			// 3. sql(게시판의 글번호 중 최댓값 계산) & pstmt
+			//   STEP1. 답글번호 계산
 			sql = "select max(bno) from itwill_board";
 			pstmt = con.prepareStatement(sql);
 			
+			// 4.
 			rs = pstmt.executeQuery();
 			
 			if (rs.next()) {
-				num = rs.getInt(1) + 1;
+				bno = rs.getInt(1) + 1;
+			//  bno = rs.getInt("max(bno)") + 1;
 			}
 			
-			System.out.println("(from BoardDAO_7.reInsertBoard) 답글 번호 : " + num);
+			System.out.println("(from BoardDAO_7.reInsertBoard) 답글 bno: " + bno);
 
-			// 4. 답글 순서 재배치
-			// re_ref(같은 그룹기준)으로 re_seq값이 기존의 값보다 큰 값이 있을경우 re_seq값을 1증가시켜서
-			// 순서재배치
+			// STEP2. 답글 순서 재배치 (update)
+			//  왜 합니까?!?!?! 한 원글(no.2)에 답글달고(2-1),, 또 달고(2-2),,,  또 달 때(2-2-1),,
+			
+			// 같은 그룹에 있으면서(=re_ref가 같으면서)
+			//  + 기존의 순서(re_seq)보다 큰 값이 있을 때만 수정,, update...
+			//    ㄴ 1. 원글의 re_seq (==0)보다 
+			//          < 2. 큰 re_seq값(==1.. == 답글 있다는 소리네~) 있으면,,,,  
+			//               3. 그 re_seq의 값보다 +1 !!!(==2) 
+			// 3. sql & pstmt & ?
 			sql = "update itwill_board "
-					+ "set re_seq = re_seq+1 " 
+					+ "set re_seq = re_seq+1 " // 3. 
 					+ "where re_ref=? and re_seq>?";
+							// 1.           2.
 			
 			pstmt = con.prepareStatement(sql);
 			
-			pstmt.setInt(1, dto.getRe_ref());
+			pstmt.setInt(1, dto.getRe_ref()); // 답글 쓰고,, action 지나서,, 여까지,,,, dto 계속 끌고 와서,,,, 사용 가능한
 			pstmt.setInt(2, dto.getRe_seq());
 			
-			pstmt.executeUpdate();
+			// 4.
+			int result = pstmt.executeUpdate(); // 위에 적은 sql 쿼리가,, 몇 개를 실행했느냐~~ 확인하려고
+			
+			if (result > 0) { //
+				System.out.println("(from BoardDAO_7.reInsertBoard) 답글 순서 재배치 완료.. 몇 개? >>" + result);
+			}
 
-			// 5. 답글 정보 저장
-			sql = "insert into itwill_board " + "values(?,?,?,?,?" + ",?,?,?,?,now()" + ",?,?)";
+			// STEP3. 답글 쓰기 (insert) ~~~~~~~ 여기서 ref, lev, seq 계산하기!!!!!!!
+			sql = "insert into itwill_board(bno, name, pass, subject, content, "
+											+ "readcount, re_ref, re_lev, re_seq, date, ip, file) "
+											+ "values(?,?,?,?,?," + "?,?,?,?,now()," + "?,?)";
 			pstmt = con.prepareStatement(sql);
-			pstmt.setInt(1, num);// bno는 가지고있는게 아니라 계산해서 만든것이므로 num사용
+			pstmt.setInt(1, bno);// bno는 dto 필통에서 꺼낸 게 아니라,, step1에서 계산해서 만든 그거,, 
 			pstmt.setString(2, dto.getName());
 			pstmt.setString(3, dto.getPass());
 			pstmt.setString(4, dto.getSubject());
 			pstmt.setString(5, dto.getContent());
-			pstmt.setInt(6, dto.getReadcount());
-			pstmt.setInt(7, dto.getRe_ref()); // 기존 원글의 그룹번호와 동일
+			
+			pstmt.setInt(6, 0); // 0으로 초기화~~ 걍 dto.getReadcount() 넣어도 0이긴 함,, 아무 값 없으니 초기값 0
+			pstmt.setInt(7, dto.getRe_ref()); // 원글의 re_ref를 똑같이 쓰니까... 
+												// 2번글 답글 -->  2-1  -->  2-2  -->  2-2-1... re_ref는 계속 2 
 			pstmt.setInt(8, dto.getRe_lev() + 1); // 기존의 값 + 1
 			pstmt.setInt(9, dto.getRe_seq() + 1); // 기존의 값 + 1
+														// ★★ content에서 답글쓰기 버튼 누르는 순간 넘어오는 그 데이터들이 여까지 온거!!! ★★
 			pstmt.setString(10, dto.getFile());
 			pstmt.setString(11, dto.getIp());
 			
 			pstmt.executeUpdate();
-			
-			result = 1;
 
-			System.out.println("(from BoardDAO_7.reInsertBoard): 저장된 답글 내용: " + dto);
-			System.out.println("(from BoardDAO_7.reInsertBoard): 답글쓰기 성공 result: " + result);
+			System.out.println("(from BoardDAO_7.reInsertBoard): 답글 작성 완!!! 저장된 답글 내용: " + dto);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -587,6 +677,221 @@ public class BoardDAO {
 	}
 	// 7. 답글 쓰기 메서드 reInsertBoard(dto) 끝
 	
+	/////////////////////////////////////////
+	// 댓글 구현 //////////////////////////////////////////////////////////////
+	// 7. getOne(c_bno) 메서드  comment 테이블의 c_bno로 데이터 한 개 가져오기 
+	public CommentDTO getOneComment(int c_bno) {
+		System.out.println("(from BoardDAO_7.getOneComment) getOneComment 메서드 호출됨");
+		
+		CommentDTO cdto = new CommentDTO();
+		
+		try {
+			// 1+2.   +6
+			con = getConnect();
+			
+			// 3. sql & pstmt & ?
+			sql = "select * from board_comment where c_bno=?";
+			
+			pstmt = con.prepareStatement(sql);
+			
+			pstmt.setInt(1, c_bno);
+			
+			// 4. sql 실행 & rs에 담기
+			rs = pstmt.executeQuery();
+			
+			// 5. rs에 담긴 데이터 처리
+			if (rs.next()){
+				
+				cdto.setC_bno(rs.getInt("c_bno"));
+				cdto.setBno(rs.getInt("bno"));
+				cdto.setName(rs.getString("name"));
+				cdto.setContent(rs.getString("content"));
+				cdto.setDate(rs.getTimestamp("date"));
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeDB();
+		}
+		return cdto;
+	}
+	// 7. getOneComment(bno) 메서드  comment 테이블의 bno로 데이터 한 개 가져오기 끝
+	
+	// 7-1. updateComment
+	public void updateComment(CommentDTO cdto) {
+		System.out.println("(from BoardDAO_7-1.updateComment) updateComment 메서드 호출됨");
+		
+		try {
+			// 1+2.   +6
+			con = getConnect();
+			
+			// 3. sql & pstmt & ?
+			sql = "update board_comment "
+					+ "set name=?, content=?, where c_bno=?";
+			
+			pstmt = con.prepareStatement(sql);
+			
+			pstmt.setString(1, cdto.getName());
+			pstmt.setString(2, cdto.getContent());
+			pstmt.setInt(3, cdto.getC_bno());
+			
+			// 4. sql 실행
+			pstmt.executeUpdate();
+			
+			System.out.println("(from BoardDAO_7-1.updateComment) 댓글 수정 완 " + cdto);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeDB();
+		}
+	}
+	// 7-1. updateComment 끝
+	
+	
+	// 7-2. deleteComment
+	public void deleteComment(int c_bno) {
+		System.out.println("(from BoardDAO_7-2.deleteComment) deleteComment 메서드 호출됨");
+		
+		try {
+			// 1+2.   +6
+			con = getConnect();
+			
+			// 3. sql & pstmt & ?
+			sql = "delete from board_comment "
+					+ "where c_bno=?";
+			
+			pstmt = con.prepareStatement(sql);
+			
+			pstmt.setInt(1, c_bno);
+			
+			// 4. sql 실행
+			pstmt.executeUpdate();
+			
+			System.out.println("(from BoardDAO_7-2.deleteComment) 댓글 삭제 완 c_bno:" + c_bno);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeDB();
+		}
+	}
+	// 7-2. deleteComment 끝
+	
+	
+	// 7-3. insertComment
+	public void insertComment(CommentDTO cdto) {
+		System.out.println("(from BoardDAO_7-3.insertComment) insertComment 메서드 호출됨");
+		
+		try {
+			// 1+2.   +6
+			con = getConnect();
+			
+			// 3. sql & pstmt & ?
+			sql = "insert into board_comment (name, content, bno) "
+					+ "values(?, ?, ?)";
+			
+			pstmt = con.prepareStatement(sql);
+			
+			pstmt.setString(1, cdto.getName());
+			pstmt.setString(2, cdto.getContent());
+			pstmt.setInt(3, cdto.getBno());
+			
+			// 4. sql 실행
+			pstmt.executeUpdate();
+			
+			System.out.println("(from BoardDAO_7-3.insertComment) 댓글 추가 완 " + cdto);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeDB();
+		}
+	}
+	// 7-3. insertComment 끝
+	
+	
+	// 7-4. getCommentCount 한 게시물의 댓글 개수 구하는 메서어드
+	public int getCommentCount(int bno){
+		int cnt = 0;
+		
+		try {
+			// 1+2.  6.
+			con = getConnect();
+			
+			// 3. sql & pstmt & ?
+			sql = "select count(*) from board_comment where bno=?"; // board Table의 bno에 속한 -> comment Table의 bno니까,,
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, bno);
+			
+			// 4. sql 실행 + rs에 담기
+			rs = pstmt.executeQuery();
+			
+			// 5. rs에 담긴 데이터 처리
+			if(rs.next()){
+				cnt = rs.getInt(1);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeDB();
+		}
+		
+		System.out.println("(from BoardDAO_7-4.getCommentCount) C: 덧글 개수는 총 " + cnt + "개^^");
+		return cnt;
+		
+	}
+	// 7-4. getCommentCount 한 게시물의 댓글 개수 구하는 메서어드 끝
+	
+	
+	// 7-5. getCommentList 한 게시물의 댓글 리스트 출력하는 메서드
+	public List<CommentDTO> getCommentList(int bno){
+		System.out.println("\n(from BoardDAO_7-5.getCommentList) C: getCommentList() 호출됨");
+
+		List<CommentDTO> cmtList = new ArrayList<CommentDTO>();
+		
+		try {
+			// 1+2
+			con = getConnect();
+
+			// 3 sql & pstmt & ?
+			sql = "select * from board_comment where bno=? order by c_bno desc";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, bno);
+			
+			// 4 sql 실행 & 날려서 가져온 결과값 rs에 담기
+			rs = pstmt.executeQuery();
+			
+			// 5 데이터 처리
+			while(rs.next()){
+				// 이 정보를 바로 배열로는 못 넣고,, DB에 저장된 정보 -> DTO 필통에 저장해서!! -> List에 저장 
+				CommentDTO cdto = new CommentDTO();
+				cdto.setC_bno(rs.getInt("c_bno"));
+				cdto.setBno(rs.getInt("bno"));
+				cdto.setName(rs.getString("name"));
+				cdto.setContent(rs.getString("content"));
+				cdto.setDate(rs.getTimestamp("date"));
+				
+				// DTO필통을 -> List에 저장쓰
+				cmtList.add(cdto);
+				
+			} // while
+			System.out.println("(from BoardDAO_7-5.getCommentList) List에 저장 완");
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+		} finally {
+			// 6
+			closeDB();
+		}
+		
+		return cmtList;
+		
+	}	
+	// 7-5. getCommentList 한 게시물의 댓글 리스트 출력하는 메서드 끝
 	
 	
 	

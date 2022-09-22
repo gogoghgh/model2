@@ -1,7 +1,11 @@
+<%@page import="java.util.List"%>
+<%@page import="com.itwillbs.board.db.BoardDAO"%>
 <%@page import="com.itwillbs.board.db.CommentDTO"%>
 <%@page import="com.itwillbs.board.db.BoardDTO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -103,7 +107,7 @@
 		</tr>
 		<tr>
 			<td>내용</td>
-			<td colspan="3" width="300px" height="300px"> ${dto.content }</td>
+			<td colspan="3" width="600px" height="300px"> ${dto.content }</td>
 		</tr>
 		<tr>
 			<td>첨부파일</td>
@@ -111,8 +115,9 @@
 		</tr>
 		<tr>
 			<td><input type="button" value="수정" onclick="location.href='./BoardUpdate.bo?bno=${dto.bno}&pageNum=${pageNum }';"></td>
-			<td><input type="button" value="삭제"></td>
-			<td><input type="button" value="답글" onclick="location.href='./BoardReWrite.bo?bno=${dto.bno}';"></td>
+			<td><input type="button" value="삭제" onclick="location.href='./BoardDelete.bo?bno=${dto.bno}&pageNum=${pageNum }';"></td>
+			<td><input type="button" value="답글" 
+					onclick="location.href='./BoardReWrite.bo?bno=${dto.bno}&pageNum=${pageNum }&re_ref=${dto.re_ref }&re_lev=${dto.re_lev }&re_seq=${re_seq }';"></td>
 		<!-- <td><input type="button" value="목록" onclick="location.href='boardList.jsp';"></td> 땡!!!! 가상 주소로 부르기-->
 		<!-- <td><input type="button" value="목록" onclick="location.href='./BoardList.bo';"></td> 땡... 
 			    근데 4페이지에 글 읽고 목록 눌러서 뒤로 갔는데,, 1페이지로 돌아가버림;; 우짜냐 
@@ -127,15 +132,63 @@
 	
 	
 <!-- ----------------------- 댓글 구간^^ --------------------------------- -->
-	<div>
-		<div class="comment-txt">
-			<textarea id="cmtCnt" name="cmtCnt" placeholder="여러분의 소중한 댓글을 입력해주세요^^"
-			 		  rows="5" cols="70"></textarea>
-		</div>
-		<div class="comment-button">
-			<button id="cmtCnt-btn">댓글 달기</button>
-		</div>
-	</div>
+				<form action="./CommentWrite.bo?pageNum=${pageNum }" method="post" name="frm" >
+					<!-- 댓글 수정, 삭제를 위한,, 파라메타.... -->
+<!-- 					<input type="hidden" name="bno" value="1"> 댓글 수정, 삭제할 때 js 함수에서 value 변경,, -->
+<!-- 					<input type="hidden" name="exe" value="1"> exe:1(댓글 추가) -->
+<%-- 					<input type="hidden" name="pageNum" value="${pageNum }"> <!-- 굳이 필요한감? 주소줄에 적었음 --> --%>
+					<input type="hidden" name="bno" value="${dto.bno }">  <!-- bno : 메인 글의 bno!! (BoardDTO의 bno!!!!) 여기가 중요 ★★★-->
+					
+					<table>
+						<tr>
+							<th colspan="2"> 댓글</th>
+						</tr>
+						<tr>
+							<td width="100"> 이름 </td>
+							<td width="150"> <input type="text" name="name"> </td>
+						</tr>
+						<tr>
+							<td> 내용 </td>
+							<td> <textarea rows="5" cols="60" name="content"></textarea> </td>
+						</tr>
+						<tr>
+							<td colspan="2">
+								<input type="submit" value="댓글 작성" name="cmd">
+								<input type="reset" value="리셋">
+							</td>
+						</tr>
+					</table>
+				</form>
+				<!-- ----------------------- 댓글 작성 구간 끝^^ --------------------------------- -->
+				
+				<br>
+				<hr>
+				
+				
+				<!-- ----------------------- 댓글 리스트 구간 --------------------------------- -->
+				<%
+					BoardDAO dao = new BoardDAO();
+					int bno = Integer.parseInt(request.getParameter("bno"));
+					List<CommentDTO> cmtList = dao.getCommentList(bno);
+					request.setAttribute("cmtList", cmtList);
+				%>
+				
+						<input type="hidden" name="c_bno" value="${cdto.c_bno }">
+				<c:forEach var="cdto" items="${cmtList }">
+					<table width="60%" style="border: 1px solid gray">
+						<tr>
+							<td> name: ${cdto.name } </td>
+							<td align="right"> <fmt:formatDate value="${cdto.date }" pattern="yyyy.MM.dd hh:mm"/>
+						</tr>
+						<tr height="60px">
+							<td colspan="2"> content: <br> ${cdto.content } </td>
+						</tr>
+					</table>
+				</c:forEach>
+						<input type="button" value="수정" onclick="location.href='./CommentUpdate.bo?c_bno=${cdto.c_bno}';">
+						<input type="button" value="삭제" onclick="location.href='#';">
+				
+				<!-- ----------------------- 댓글 리스트 구간 끝^^ --------------------------------- -->
 	
 </body>
 </html>

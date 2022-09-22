@@ -23,9 +23,15 @@
 						// == Model2/BoardWrite.bo
 		
 		// 글 리스트 페이지 이동
-		response.sendRedirect("./BoardList.bo");
+// 		response.sendRedirect("./BoardList.bo");
 						// == Model2/BoardList.bo
 		
 	%>
+	
+<!-- 	<a href="./Main.me"><h2>메인</h2></a> -->
+<!-- 	<a href="./MemberLogin.me"><h2>로그인</h2></a> -->
+	<a href="./BoardWrite.bo"><h2>글쓰기</h2></a>
+	<a href="./BoardList.bo"><h2>글목록</h2></a>
+	
 </body>
 </html>

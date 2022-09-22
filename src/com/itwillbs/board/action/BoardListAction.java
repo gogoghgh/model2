@@ -1,5 +1,6 @@
 package com.itwillbs.board.action;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +31,7 @@ public class BoardListAction implements Action{
 		// 한 페이지에 보여줄 글의 개수 설정
 		String urlpageSize = request.getParameter("pageSize"); // 네이버 쇼핑처럼 ㅎ
 			if(urlpageSize == null) {
-				urlpageSize = "5"; // 기본값은 10개 -> 2
+				urlpageSize = "20"; // 기본값은 10개 -> 2
 			}
 		
 	  //int pageSize = 5; // 내가 개수 딱 정해놓는거    // 구
@@ -101,7 +102,7 @@ public class BoardListAction implements Action{
 											// 나머지 없으면 0 더하고 : 나머지 있으면 1페이지 더하고
 		
 		// 한 화면에 보여줄 페이지 수(= 페이지 블럭) 몇 개 할거냐??? 정하기     이전 1 2 3 4 5.. 9 10 다음
-		int pageBlock = 3; // 10 -> 3개로 줄임,,,,, 이전 다음 때메 
+		int pageBlock = 5; // 10 -> 3개로 줄임,,,,, 이전 다음 때메 
 		
 		// 페이지 블럭의 시작 번호.. 1~10번 페이지블럭     11~20 페이지 블럭    21~30 페이지 블럭
 								    //  시작 번호: 1          11                   21
@@ -121,6 +122,21 @@ public class BoardListAction implements Action{
 			endPage = pageCount;
 		}
 		// 페이징 처리2 (하단 페이지 링크... 이전, 다음,, 1 2 3페이지ㅡ,,,,,) ---------------------------- 끝
+		
+		
+		// 댓글 개수
+
+		List<Integer> cmtList = new ArrayList<>();
+		
+		for(int i = 0; i < boardList.size(); i++){
+			int bno = boardList.get(i).getBno();
+			System.out.println(bno);
+			System.out.println(dao.getCommentCount(bno));
+			cmtList.add(dao.getCommentCount(bno));
+		}
+		
+		request.setAttribute("cmtList", cmtList);
+
 		
 		
 		// Model(지금 여기.. Action) -> view 페이지로 boardList 정보 전달을 위해, request 영역에 저장

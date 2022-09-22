@@ -12,7 +12,9 @@
 <body>
 	<h1>/board/boardList.jsp</h1>
 	<h2> 가현스 게시판 💖  </h2> 
-	<h1 style="color: salmon">공지: 깃허브 닉네임 추천 받아요^^  </h1>
+	<h1 style="color: white; background-color: red; display: inline;">공지: 청 해 진 O U T / 부장님 OUT    </h1>
+	<h1 style="color: white; background-color: skyblue; display: inline;">데브현지 I N   </h1>
+	<h3>✨🎊이벤트: 111번 글쓴이에게 맛있는 과자 🍩🍪 선물💝🎉 을 드립니다 🎁😍 념념굿</h3>
 	<%
 		// List<BoardDTO> boardList = (List<BoardDTO>)request.getAttribute("boardList"); 
 	
@@ -44,35 +46,51 @@
 	<table border="1">
 		<tr>
 			<th>번호</th>
-			<th width="150px">제목</th>
-			<th>내용</th>
+			<th width="400px">제목</th>
 			<th>글쓴이</th>
 			<th>조회수</th>
 			<th>작성일</th>
 			<th>IP</th>
+			<th>re_ref</th>
+			<th>re_lev</th>
+			<th>re_seq</th>
 		</tr>
 		
-	<c:forEach var="dto" items="${requestScope.boardList }">   <!-- 정석^^ requestScope. 생략해도 똑같다 ,,, 
+	<c:forEach var="dto" items="${requestScope.boardList }" varStatus="status">   
+											<!-- 정석^^ requestScope. 생략해도 똑같다 ,,, 
 															List에서 꺼낸 데이터는? DTO -> dto.get해서 꺼내기-->
 		<tr>
 			<td>${dto.bno }</td>
 			<td>
+				
+				<c:if test="${dto.re_lev gt 0 }"> <!-- 답글일 때만~~ 얘네 보여야 하니까~~~  -->
+					<img alt="들여쓰기" src="./board/level.gif" width="${dto.re_lev * 20 }" height="10px">
+																	<!-- 
+																	 레벨 1인 애는 너비 20
+																	 레벨 2인 애는 너비 40...
+																	  -->
+					<img alt="답걸표시" src="./board/re.gif">
+				</c:if>
+				
+				
 				<%-- ↓↓↓↓ <a href="./BoardContent.bo"> ${dto.subject } </a>   --%>  
 				<%-- ↓↓↓↓ <a href="./BoardContent.bo?bno=${dto.bno }"> ${dto.subject } </a> --%>  
 					<!--  ㄴ 이 링크 눌렀을 때, 몇 번(bno) 글 눌렀는지 그 정보도 같이 보내야 함!!!
 								컨트롤러 1단계에서 파라메타까지 넘어가서,, else if 에서 false 걸리는 거 아냐?! 
 								아님~~ ?뒤는 안 보임~~~ ㄱㅊ~~    -->
-				<a href="./BoardContent.bo?bno=${dto.bno }&pageNum=${requestScope.pageNum}"> ${dto.subject } </a>
+				<a href="./BoardContent.bo?bno=${dto.bno }&pageNum=${requestScope.pageNum}"> ${dto.subject } &nbsp;  [ ${cmtList[status.index] }  ] </a></a>
 						   <!-- ㄴ 그리고,, 주소줄에 pageNum도 같이 보내야,,, 
 						   			글 내용 읽고 뒤로 돌아왔을 때, 보던 그 페이지가 보이겠지요??
 						   			request 영역에 pageNum 저장해놨으니까 이렇게 삽가능 	
 								   -->
 			</td>
-			<td>${dto.content }</td>
 			<td>${dto.name }</td>
 			<td>${dto.readcount }</td>
 			<td>${dto.date }</td>
 			<td>${dto.ip }</td>
+			<td>${dto.re_ref }</td>
+			<td>${dto.re_lev }</td>
+			<td>${dto.re_seq }</td>
 		</tr>
 	</c:forEach>
 		
