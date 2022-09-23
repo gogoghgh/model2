@@ -256,16 +256,40 @@ public class BoardFrontController extends HttpServlet{
 			}
 			
 		} // CommentUpdate.bo 끝
-		
-		
-		
 		// 댓글 구현 끝////////////////////////////////////////
 
+		
+		else if (command.equals("/FileBoardWrite.bo")){
+			System.out.println("(from BoardFrontController_doProcess) C: /FileBoardWrite.bo 호출");
+			System.out.println("(from BoardFrontController_doProcess) C: DB 사용 X, 연결된 view 출력");
+			
+			forward = new ActionForward();
+			forward.setPath("./board/fWriteForm.jsp");
+			forward.setRedirect(false); // jsp 페이지로 이동하닉하,, 주소줄에 보이지 않도록,,,, forward 방식으로 이동
+			
+		} // FileBoardWrite.bo
+		
+		else if (command.equals("/FileBoardWriteAction.bo")){
+			System.out.println("(from BoardFrontController_doProcess) C: /FileBoardWriteAction.bo 호출");
+			System.out.println("(from BoardFrontController_doProcess) C: 파일 업로드, DB 저장 O, 페이지 이동");
+			
+			action = new FileBoardWriteAction();
+			
+			try {
+				action.execute(request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+		} // FileBoardWriteAction.bo
 		
 		
 		// 2. 가상 주소 매핑 끝 -----------------------------------
 		System.out.println("2. 가상 주소 매핑 끝-----------\n");
 
+		
+		
+		
 		
 		System.out.println("\n3. 가상 주소 이동 시작-----------");
 		// 3. 가상 주소 이동 시작 ----------------------------

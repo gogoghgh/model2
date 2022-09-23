@@ -42,6 +42,7 @@
 	%>
 	
 	<h3><a href="./BoardWrite.bo">글쓰기 페이지로 이동</a></h3>
+	<h3><a href="./FileBoardWrite.bo">파일 첨부(정후 사진 금지) 글쓰기 ⭐ </a></h3>
 	
 	<table border="1">
 		<tr>
@@ -64,7 +65,7 @@
 			<td>
 				
 				<c:if test="${dto.re_lev gt 0 }"> <!-- 답글일 때만~~ 얘네 보여야 하니까~~~  -->
-					<img alt="들여쓰기" src="./board/level.gif" width="${dto.re_lev * 20 }" height="10px">
+					<img alt="들여쓰기" src="./board/level.gif" width="${dto.re_lev * 20 }" height="5px">
 																	<!-- 
 																	 레벨 1인 애는 너비 20
 																	 레벨 2인 애는 너비 40...
